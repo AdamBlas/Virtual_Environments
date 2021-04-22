@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bow_ChordDrawer : MonoBehaviour
+public class Bow_BowstringDrawer : MonoBehaviour
 {
     [SerializeField]
     private Transform pointA;

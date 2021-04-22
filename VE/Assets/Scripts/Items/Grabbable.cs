@@ -61,13 +61,11 @@ public class Grabbable : MonoBehaviour
     public void DisablePhysics()
     {
         rb.isKinematic = true;
-        rb.detectCollisions = false;
         rb.useGravity = false;
     }
     public void EnablePhysics()
     {
         rb.isKinematic = false;
-        rb.detectCollisions = true;
         rb.useGravity = true;
     }
 
