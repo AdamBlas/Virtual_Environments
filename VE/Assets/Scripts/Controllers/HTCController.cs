@@ -85,6 +85,9 @@ public class HTCController : MonoBehaviour
         /// <summary> BoolButton object representing Primary Button (doesn't work for now) </summary>
         public BoolButton Button { get; private set; }
 
+        /// <summary> BoolButton object representing Touchpad (only detects if pad is pressed, not area touched) </summary>
+        public BoolButton TouchpadButton { get; private set; }
+
 
 
         /// <summary> Constructor of the Device class </summary>
@@ -100,6 +103,7 @@ public class HTCController : MonoBehaviour
             Trigger = new BoolButton(CommonUsages.triggerButton);
             Grip = new BoolButton(CommonUsages.gripButton);
             Button = new BoolButton(CommonUsages.primaryButton);
+            TouchpadButton = new BoolButton(CommonUsages.primary2DAxisClick);
         }
 
         /// <summary> Resets device if device was lost/not found immediately </summary>
@@ -120,6 +124,7 @@ public class HTCController : MonoBehaviour
             Trigger.Update(device);
             Grip.Update(device);
             Button.Update(device);
+            TouchpadButton.Update(device);
         }
 
         /// <summary> Prints pressed buttons on console </summary>
@@ -133,6 +138,9 @@ public class HTCController : MonoBehaviour
 
             if (Button.Pressed)
                 print(name + " button pressed.");
+
+            if (TouchpadButton.Pressed)
+                print(name + " touchpad pressed.");
         }
     }
 
