@@ -8,6 +8,7 @@ TagManager:
   - RightHand
   - LeftHand
   - Terrain
+  - Arrow
   layers:
   - Default
   - TransparentFX

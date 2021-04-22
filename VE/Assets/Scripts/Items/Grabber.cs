@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class Grabber : MonoBehaviour
 {
+    /// <summary> Assigned device </summary>
+    private HTCController.Device device;
+
     /// <summary> GameObject that grabber is currently holding </summary>
-    private Grabbable heldItem;
+    [HideInInspector]
+    public Grabbable heldItem { get; private set; }
 
     /// <summary> GameObject that will be grabbed if such command is registered </summary>
     [HideInInspector]
     public Grabbable hoveredItem;
-
-    /// <summary> Whether or not hovered item's rotation should be adjusted when grabbed </summary>
-    [HideInInspector]
-    public bool resetRotation;
 
     /// <summary> Grabber's Velocity Calculator </summary>
     VelocityCalculator vc;
@@ -26,13 +26,14 @@ public class Grabber : MonoBehaviour
         if (heldItem != null || hoveredItem == null)
             return false;
 
-        heldItem = hoveredItem;                                                   // Set hovered item as currently held
-        hoveredItem = null;                                                       // Reset hovered item
-        heldItem.rb.isKinematic = true;                                           // Disable rigidbody
-        heldItem.transform.SetParent(this.transform);                             // Set parent
-        heldItem.transform.localPosition = Vector3.zero;                          // Reset local position
-        if (resetRotation)
-            heldItem.transform.localRotation = Quaternion.Euler(90, 0, 0);        // Reset local rotation if needed
+        heldItem = hoveredItem;                                                             // Set hovered item as currently held
+        hoveredItem = null;                                                                 // Reset hovered item
+        heldItem.DisablePhysics();                                                          // Disable rigidbody
+        heldItem.transform.SetParent(this.transform);                                       // Set parent
+        heldItem.transform.localPosition = Vector3.zero;                                    // Reset local position
+        if (heldItem.resetRotationWhileGrabbed)
+            heldItem.transform.localRotation = Quaternion.Euler(heldItem.rotationBase);     // Reset local rotation if needed
+        heldItem.onGrab?.Invoke(this);                                                      // Invoke onGrab delegate
 
         return true;
     }
@@ -46,9 +47,10 @@ public class Grabber : MonoBehaviour
             return false;
 
         heldItem.transform.SetParent(null);                       // Unparent item
-        heldItem.rb.isKinematic = false;                          // Enable rigidbidy
+        heldItem.EnablePhysics();                                 // Enable rigidbidy
         heldItem.rb.velocity = vc.Velocity;                       // Apply current velocity, so the item won't fall straight down, but rather act like it is thrown
         //holdedItem.rb.angularVelocity = vc.AngularVelocity;         // Apply current angular velocity (results look strange, so comment this line if needed) 
+        heldItem.onRelease?.Invoke(this);                         // Invoke onRelese delegate
         heldItem = null;                                          // Reset held item
         return true;
     }
@@ -56,11 +58,18 @@ public class Grabber : MonoBehaviour
     void Start()
     {
         vc = GetComponent<VelocityCalculator>();
+
+        if (gameObject.tag.Equals("LeftHand"))
+            device = HTCController.LeftHandInput;
+        else if (gameObject.tag.Equals("RightHand"))
+            device = HTCController.RightHandInput;
+        else
+            throw new System.InvalidOperationException("Unknown device");
     }
     void Update()
     {
         // If grip is pressed, invoke proper method
-        if (HTCController.RightHandInput.Grip.Pressed)
+        if (device.Grip.Down)
         {
             if (heldItem == null)
                 GrabItem();

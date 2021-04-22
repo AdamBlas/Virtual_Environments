@@ -18,10 +18,10 @@ public class HTCController : MonoBehaviour
             private bool wasDownLastFrame = false;
 
             /// <summary> Flag that indicates if button was pressed in this frame </summary>
-            public bool Pressed { get; private set; }
+            public bool Down { get; private set; }
 
             /// <summary> Flag that indicates if button is pressed down </summary>
-            public bool Down { get; private set; }
+            public bool Pressed { get; private set; }
 
             /// <summary> Flag that indicates if button was released in this frame </summary>
             public bool Released { get; private set; }
@@ -41,15 +41,15 @@ public class HTCController : MonoBehaviour
                 device.TryGetFeatureValue(button, out bool currentValue);
 
                 // Set current status
-                Down = currentValue;
+                Pressed = currentValue;
 
                 if (currentValue)
                 {
                     // Calculate if this is first frame the button is down
                     if (!wasDownLastFrame)
-                        Pressed = true;
+                        Down = true;
                     else
-                        Pressed = false;
+                        Down = false;
                 }
                 else
                 {
@@ -130,16 +130,16 @@ public class HTCController : MonoBehaviour
         /// <summary> Prints pressed buttons on console </summary>
         public void DebugDevice()
         {
-            if (Trigger.Pressed)
+            if (Trigger.Down)
                 print(name + " trigger pressed.");
 
-            if (Grip.Pressed)
+            if (Grip.Down)
                 print(name + " grip pressed.");
 
-            if (Button.Pressed)
+            if (Button.Down)
                 print(name + " button pressed.");
 
-            if (TouchpadButton.Pressed)
+            if (TouchpadButton.Down)
                 print(name + " touchpad pressed.");
         }
     }
@@ -163,10 +163,14 @@ public class HTCController : MonoBehaviour
     /// <summary> Right hand's representation in game </summary>
     public static GameObject RightHand { get => @this._rightHand; set => @this._rightHand = value; }
 
+    /// <summary> Right hand's Grabber </summary>
+    public static Grabber RightHandGrabber { get; private set; }
+
+    /// <summary> Left hand's Grabber </summary>
+    public static Grabber LeftHandGrabber { get; private set; }
+
     private List<InputDevice> leftDevices = new List<InputDevice>();
     private List<InputDevice> rightDevices = new List<InputDevice>();
-
-
 
     void Awake()
     {
@@ -182,12 +186,13 @@ public class HTCController : MonoBehaviour
 
         LeftHandInput = new Device(leftDevices.FirstOrDefault(), XRNode.LeftHand, "Left hand");
         RightHandInput = new Device(rightDevices.FirstOrDefault(), XRNode.RightHand, "Right hand");
+
+        LeftHandGrabber = LeftHand.GetComponent<Grabber>();
+        RightHandGrabber = RightHand.GetComponent<Grabber>();
     }
     void Update()
     {
         LeftHandInput.Update();
         RightHandInput.Update();
-
-        LeftHandInput.DebugDevice();
     }
 }

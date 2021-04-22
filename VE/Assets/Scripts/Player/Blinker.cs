@@ -26,7 +26,7 @@ public class Blinker : MonoBehaviour
     void Update()
     {
         // If right touchpad is pressed, create ray object and assign it to hand object, so it follows hand movement
-        if (HTCController.RightHandInput.TouchpadButton.Pressed)
+        if (HTCController.RightHandInput.TouchpadButton.Down)
         {
             ray = GameObject.Instantiate(rayPrefab);                        // Create ray
             ray.transform.SetParent(HTCController.RightHand.transform);     // Set its parent
