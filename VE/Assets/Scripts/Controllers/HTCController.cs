@@ -11,7 +11,10 @@ public class HTCController : MonoBehaviour
         /// <summary> Container class for boolean-valued buttons. </summary>
         public class BoolButton
         {
+            /// <summary> Button type </summary>
             private InputFeatureUsage<bool> button;
+
+            /// <summary> Flag that idicates if button was pressed last frame </summary>
             private bool wasDownLastFrame = false;
 
             /// <summary> Flag that indicates if button was pressed in this frame </summary>
@@ -23,17 +26,26 @@ public class HTCController : MonoBehaviour
             /// <summary> Flag that indicates if button was released in this frame </summary>
             public bool Released { get; private set; }
 
+            /// <summary> Constructor </summary>
+            /// <param name="button"> Button type </param>
             public BoolButton(InputFeatureUsage<bool> button)
             {
                 this.button = button;
             }
+
+            /// <summary> Method that is supposed to be invoked every frame </summary>
+            /// <param name="device"> Input source device </param>
             public void Update(InputDevice device)
             {
+                // Get current status of the button
                 device.TryGetFeatureValue(button, out bool currentValue);
 
+                // Set current status
                 Down = currentValue;
+
                 if (currentValue)
                 {
+                    // Calculate if this is first frame the button is down
                     if (!wasDownLastFrame)
                         Pressed = true;
                     else
@@ -41,6 +53,7 @@ public class HTCController : MonoBehaviour
                 }
                 else
                 {
+                    // Calculate if this is first frame the button is released
                     if (wasDownLastFrame)
                         Released = true;
                     else
@@ -53,14 +66,31 @@ public class HTCController : MonoBehaviour
 
         /// <summary> Assigned device </summary>
         private InputDevice device;
+
+        /// <summary> List of devices for specified node </summary>
         private List<InputDevice> devices = new List<InputDevice>();
+
+        /// <summary> Node indicationg type of device </summary>
         private XRNode node;
+
+        /// <summary> Name of device (for debug purpose) </summary>
         public string name;
 
+        /// <summary> BoolButton object representing Trigger </summary>
         public BoolButton Trigger { get; private set; }
+
+        /// <summary> BoolButton object representing Grip </summary>
         public BoolButton Grip { get; private set; }
+
+        /// <summary> BoolButton object representing Primary Button (doesn't work for now) </summary>
         public BoolButton Button { get; private set; }
 
+
+
+        /// <summary> Constructor of the Device class </summary>
+        /// <param name="device"> Input source device </param>
+        /// <param name="node"> Device's node </param>
+        /// <param name="name"> Name of device </param>
         public Device(InputDevice device, XRNode node, string name)
         {
             this.device = device;
@@ -71,11 +101,15 @@ public class HTCController : MonoBehaviour
             Grip = new BoolButton(CommonUsages.gripButton);
             Button = new BoolButton(CommonUsages.primaryButton);
         }
+
+        /// <summary> Resets device if device was lost/not found immediately </summary>
         public void GetDevice()
         {
             InputDevices.GetDevicesAtXRNode(node, devices);
             device = devices.FirstOrDefault();
         }
+
+        /// <summary> Update function that is supposed to be invoked every frame </summary>
         public void Update()
         {
             if (!device.isValid)
@@ -85,7 +119,10 @@ public class HTCController : MonoBehaviour
 
             Trigger.Update(device);
             Grip.Update(device);
+            Button.Update(device);
         }
+
+        /// <summary> Prints pressed buttons on console </summary>
         public void DebugDevice()
         {
             if (Trigger.Pressed)
@@ -99,27 +136,34 @@ public class HTCController : MonoBehaviour
         }
     }
 
+    /// <summary> Pointer to object from static access </summary>
     public static HTCController @this;
 
+    /// <summary> Left hand input device </summary>
     public static Device LeftHandInput { get; private set; }
+
+    /// <summary> Right hand input device </summary>
     public static Device RightHandInput { get; private set; }
 
     [SerializeField]
     private GameObject _leftHand;
+    /// <summary> Left hand's representation in game </summary>
     public static GameObject LeftHand { get => @this._leftHand; set => @this._leftHand = value; }
 
     [SerializeField]
     private GameObject _rightHand;
+    /// <summary> Right hand's representation in game </summary>
     public static GameObject RightHand { get => @this._rightHand; set => @this._rightHand = value; }
 
     private List<InputDevice> leftDevices = new List<InputDevice>();
     private List<InputDevice> rightDevices = new List<InputDevice>();
 
+
+
     void Awake()
     {
         @this = this;
     }
-
     void Start()
     {
         LeftHand = GameObject.FindGameObjectWithTag("LeftHand");
