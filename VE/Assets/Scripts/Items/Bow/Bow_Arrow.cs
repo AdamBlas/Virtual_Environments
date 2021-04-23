@@ -2,10 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bow_ReleasedArrow : MonoBehaviour
+public class Bow_Arrow : MonoBehaviour
 {
     /// <summary> List of indicators </summary>
     List<GameObject> indicators = new List<GameObject>();
+    Transform parent;
+    Vector3 posOffset;
+    Vector3 rotOffset;
 
     float velocityReductor = .2f;
     float arrowsLength;
@@ -13,6 +16,21 @@ public class Bow_ReleasedArrow : MonoBehaviour
     void Start()
     {
         arrowsLength = 2 * this.transform.GetChild(0).transform.position.y;
+        this.GetComponent<Grabbable>().onGrab += OnGrab;
+    }
+
+    void Update()
+    {
+        if (parent != null)
+        {
+            this.transform.position = parent.transform.position + posOffset;
+            this.transform.rotation = Quaternion.Euler(parent.transform.rotation.eulerAngles + rotOffset);
+        }
+    }
+
+    void OnGrab(Grabber _)
+    {
+        parent = null;
     }
 
     public void ReleaseArrow(float velocity)
@@ -65,7 +83,17 @@ public class Bow_ReleasedArrow : MonoBehaviour
             float distance = Mathf.Max(Vector3.Distance(lastPos, newPos), arrowsLength);
             if (Physics.Raycast(origin: lastPos, direction: (newPos - lastPos), maxDistance: distance, layerMask: LayerMask.GetMask("Terrain"), hitInfo: out RaycastHit hit))
             {
-                this.transform.position = hit.point - ((newPos - lastPos).normalized * arrowsLength * .5f);
+                this.transform.position = hit.point - ((newPos - lastPos).normalized * arrowsLength * .3f);
+                
+                if (hit.collider.tag.Equals("Target"))
+                {
+                    parent = hit.collider.transform;
+                    posOffset = this.transform.position - parent.transform.position;
+                    rotOffset = this.transform.rotation.eulerAngles - parent.transform.rotation.eulerAngles;
+
+                    hit.collider.GetComponent<ShootingTarget>().AnalyzeHit(hit.point);
+                }
+
                 yield break;
             }
 

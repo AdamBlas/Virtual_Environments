@@ -10,7 +10,7 @@ public class Bow_BowstringGrabber : MonoBehaviour
     bool isInside = false;
     private Vector3 pointZero;
     private Grabbable arrowGrab;
-    private Bow_ReleasedArrow arrowComp;
+    private Bow_Arrow arrowComp;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -98,7 +98,7 @@ public class Bow_BowstringGrabber : MonoBehaviour
     void PutAnArronOnBowstring()
     {
         arrowGrab = RightHandGrabber.heldItem;
-        arrowComp = arrowGrab.GetComponent<Bow_ReleasedArrow>();
+        arrowComp = arrowGrab.GetComponent<Bow_Arrow>();
         RightHandGrabber.LetItemGo();
         arrowGrab.DisablePhysics();
         arrowGrab.transform.SetParent(this.transform);
@@ -108,7 +108,7 @@ public class Bow_BowstringGrabber : MonoBehaviour
     void ReleaseArrow(float velocity)
     {
         arrowGrab.transform.SetParent(null);
-        arrowGrab.GetComponent<Bow_ReleasedArrow>().ReleaseArrow(velocity);
+        arrowGrab.GetComponent<Bow_Arrow>().ReleaseArrow(velocity);
 
         arrowGrab = null;
         arrowComp = null;

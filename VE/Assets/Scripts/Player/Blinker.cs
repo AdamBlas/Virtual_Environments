@@ -35,7 +35,7 @@ public class Blinker : MonoBehaviour
         }
 
         // If right touchpad is released, send raycats to check if ray hit something, blink player if yes, and destroy ray object
-        if (HTCController.RightHandInput.TouchpadButton.Released)
+        if (HTCController.RightHandInput.TouchpadButton.Released && ray != null)
         {
             if (Physics.Raycast(origin: ray.transform.position, direction: ray.transform.up, maxDistance: 10, layerMask: LayerMask.GetMask("Terrain"), hitInfo: out RaycastHit hit))
             {
