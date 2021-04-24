@@ -15,6 +15,9 @@ public class VRController : MonoBehaviour
             /// <summary> Assigned hand </summary>
             private SteamVR_Input_Sources hand;
 
+            /// <summary> Assigned device </summary>
+            private Device device;
+
             /// <summary> Assigned button </summary>
             private SteamVR_Action_Boolean button;
 
@@ -25,18 +28,30 @@ public class VRController : MonoBehaviour
             public bool Down { get; private set; }
 
             /// <summary> Flag that indicates if button is pressed down </summary>
-            public bool Pressed { get; private set; }
+            public bool Hold { get; private set; }
 
             /// <summary> Flag that indicates if button was released in this frame </summary>
             public bool Released { get; private set; }
 
+            /// <summary> Delegate invoked when button is pressed </summary>
+            public Toolbox.void_Device onDown;
+
+            /// <summary> Delegate invoked when button is held down </summary>
+            public Toolbox.void_Device onHold;
+
+            /// <summary> Delegate invoked when button is released </summary>
+            public Toolbox.void_Device onRelease;
+
+
+
             /// <summary> Constructor </summary>
             /// <param name="hand"> Hand that device is assigned to </param>
             /// <param name="button"> Assigned button </param>
-            public BoolButton(SteamVR_Input_Sources hand, SteamVR_Action_Boolean button)
+            public BoolButton(SteamVR_Input_Sources hand, SteamVR_Action_Boolean button, Device device)
             {
                 this.hand = hand;
                 this.button = button;
+                this.device = device;
             }
 
             /// <summary> Method that is supposed to be invoked every frame </summary>
@@ -46,13 +61,19 @@ public class VRController : MonoBehaviour
                 bool currentValue = button.GetState(hand);
 
                 // Set current status
-                Pressed = currentValue;
+                Hold = currentValue;
+
 
                 if (currentValue)
                 {
+                    onHold?.Invoke(device);
+
                     // Calculate if this is first frame the button is down
                     if (!wasDownLastFrame)
+                    {
                         Down = true;
+                        onDown?.Invoke(device);
+                    }
                     else
                         Down = false;
                 }
@@ -60,7 +81,10 @@ public class VRController : MonoBehaviour
                 {
                     // Calculate if this is first frame the button is released
                     if (wasDownLastFrame)
+                    {
                         Released = true;
+                        onRelease?.Invoke(device);
+                    }
                     else
                         Released = false;
                 }
@@ -106,10 +130,10 @@ public class VRController : MonoBehaviour
             this.gameObject = gameObject;
             this.grabber = gameObject.GetComponent<Grabber>();
 
-            Trigger = new BoolButton(hand, SteamVR_Actions.Averagers_Model.Trigger);
-            Grip = new BoolButton(hand, SteamVR_Actions.Averagers_Model.Grip);
-            Button = new BoolButton(hand, SteamVR_Actions.Averagers_Model.Button_1);
-            TouchpadButton = new BoolButton(hand, SteamVR_Actions.Averagers_Model.Touchpad_Button);
+            Trigger = new BoolButton(hand, SteamVR_Actions.Averagers_Model.Trigger, this);
+            Grip = new BoolButton(hand, SteamVR_Actions.Averagers_Model.Grip, this);
+            Button = new BoolButton(hand, SteamVR_Actions.Averagers_Model.Button_1, this);
+            TouchpadButton = new BoolButton(hand, SteamVR_Actions.Averagers_Model.Touchpad_Button, this);
         }
 
         /// <summary> Update function that is supposed to be invoked every frame </summary>

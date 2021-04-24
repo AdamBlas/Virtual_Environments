@@ -18,14 +18,14 @@ public class Bow_BowstringGrabber : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag.Equals("RightHand"))
+        if (other.CompareTag("RightHand"))
         {
             isInside = true;
         }
     }
     private void OnTriggerExit(Collider other)
     {
-        if (other.tag.Equals("RightHand"))
+        if (other.CompareTag("RightHand"))
         {
             isInside = false;
         }

@@ -5,5 +5,6 @@ using UnityEngine;
 public static class Toolbox
 {
     public delegate void void_Grabber(Grabber g);
+    public delegate void void_Device(VRController.Device d);
     public delegate void void_void();
 }
