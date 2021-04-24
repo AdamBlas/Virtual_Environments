@@ -165,5 +165,8 @@ public class VRController : MonoBehaviour
     {
         LeftHand.Update();
         RightHand.Update();
+
+        //LeftHand.DebugDevice();
+        //RightHand.DebugDevice();
     }
 }

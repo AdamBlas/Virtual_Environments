@@ -10,13 +10,13 @@ public class Bow_Arrow : MonoBehaviour
     Vector3 posOffset;
     Vector3 rotOffset;
 
-    float velocityReductor = .2f;
+    float velocityReductor = .5f;
     float arrowsLength;
 
     void Start()
     {
         arrowsLength = 2 * this.transform.GetChild(0).transform.position.y;
-        this.GetComponent<Grabbable>().onGrab += OnGrab;
+        GetComponent<Grabbable>().onGrab += ((_) => { parent = null; });
     }
 
     void Update()
@@ -28,7 +28,7 @@ public class Bow_Arrow : MonoBehaviour
         }
     }
 
-    void OnGrab(Grabber _)
+    public void OnGrab(Grabber _)
     {
         parent = null;
     }

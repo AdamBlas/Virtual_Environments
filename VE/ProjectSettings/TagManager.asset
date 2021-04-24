@@ -10,6 +10,7 @@ TagManager:
   - Terrain
   - Arrow
   - Target
+  - FireSource
   layers:
   - Default
   - TransparentFX
