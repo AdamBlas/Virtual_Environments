@@ -26,16 +26,16 @@ public class Blinker : MonoBehaviour
     void Update()
     {
         // If right touchpad is pressed, create ray object and assign it to hand object, so it follows hand movement
-        if (HTCController.RightHandInput.TouchpadButton.Down)
+        if (VRController.RightHand.TouchpadButton.Down)
         {
-            ray = GameObject.Instantiate(rayPrefab);                        // Create ray
-            ray.transform.SetParent(HTCController.RightHand.transform);     // Set its parent
-            ray.transform.localPosition = Vector3.zero;                     // Reset its local position
-            ray.transform.localRotation = Quaternion.Euler(90, 0, 0);       // Reset its local rotation, rotate by 90 degrees so it points in the right direction
+            ray = GameObject.Instantiate(rayPrefab);                                // Create ray
+            ray.transform.SetParent(VRController.RightHand.gameObject.transform);   // Set its parent
+            ray.transform.localPosition = Vector3.zero;                             // Reset its local position
+            ray.transform.localRotation = Quaternion.Euler(90, 0, 0);               // Reset its local rotation, rotate by 90 degrees so it points in the right direction
         }
 
         // If right touchpad is released, send raycats to check if ray hit something, blink player if yes, and destroy ray object
-        if (HTCController.RightHandInput.TouchpadButton.Released && ray != null)
+        if (VRController.RightHand.TouchpadButton.Released && ray != null)
         {
             if (Physics.Raycast(origin: ray.transform.position, direction: ray.transform.up, maxDistance: 10, layerMask: LayerMask.GetMask("Terrain"), hitInfo: out RaycastHit hit))
             {

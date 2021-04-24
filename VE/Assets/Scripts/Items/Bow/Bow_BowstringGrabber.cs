@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static HTCController;
+using static VRController;
 
 public class Bow_BowstringGrabber : MonoBehaviour
 {
@@ -35,9 +35,9 @@ public class Bow_BowstringGrabber : MonoBehaviour
 
     void Update()
     {
-        if (isInside && RightHandInput.Trigger.Down)
+        if (isInside && RightHand.Trigger.Down)
         {
-            if (RightHandGrabber.heldItem != null && RightHandGrabber.heldItem.tag.Equals("Arrow"))
+            if (RightHand.grabber.heldItem != null && RightHand.grabber.heldItem.tag.Equals("Arrow"))
             {
                 PutAnArronOnBowstring();
             }
@@ -50,13 +50,13 @@ public class Bow_BowstringGrabber : MonoBehaviour
     {
         while (true)
         {
-            if (RightHandInput.Trigger.Released)
+            if (RightHand.Trigger.Released)
             {
                 ReleaseBowstring();
                 yield break;
             }
 
-            this.transform.position = RightHand.transform.position;
+            this.transform.position = RightHand.gameObject.transform.position;
             this.transform.localPosition = new Vector3(0, 0, this.transform.localPosition.z);
 
             float diff = pointZero.z - this.transform.localPosition.z;
@@ -97,9 +97,9 @@ public class Bow_BowstringGrabber : MonoBehaviour
     }
     void PutAnArronOnBowstring()
     {
-        arrowGrab = RightHandGrabber.heldItem;
+        arrowGrab = RightHand.grabber.heldItem;
         arrowComp = arrowGrab.GetComponent<Bow_Arrow>();
-        RightHandGrabber.LetItemGo();
+        RightHand.grabber.LetItemGo();
         arrowGrab.DisablePhysics();
         arrowGrab.transform.SetParent(this.transform);
         arrowGrab.transform.localPosition = Vector3.zero;

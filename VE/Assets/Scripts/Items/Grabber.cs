@@ -5,7 +5,7 @@ using UnityEngine;
 public class Grabber : MonoBehaviour
 {
     /// <summary> Assigned device </summary>
-    private HTCController.Device device;
+    private VRController.Device device;
 
     /// <summary> GameObject that grabber is currently holding </summary>
     [HideInInspector]
@@ -60,9 +60,9 @@ public class Grabber : MonoBehaviour
         vc = GetComponent<VelocityCalculator>();
 
         if (gameObject.tag.Equals("LeftHand"))
-            device = HTCController.LeftHandInput;
+            device = VRController.LeftHand;
         else if (gameObject.tag.Equals("RightHand"))
-            device = HTCController.RightHandInput;
+            device = VRController.RightHand;
         else
             throw new System.InvalidOperationException("Unknown device");
     }
