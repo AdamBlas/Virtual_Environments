@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Grabbable : MonoBehaviour
 {
+    [Header("Interaction variables")]
+
     /// <summary> Flag that indicates whether object can be grabbed with left hand </summary>
     public bool canBeGrabbedWithLeftHand = false;
 
@@ -22,6 +24,15 @@ public class Grabbable : MonoBehaviour
     /// <summary> Delegate invoked on relase </summary>
     public Toolbox.void_Grabber onRelease;
 
+    [Space]
+    [Header("Audio properties")]
+
+    /// <summary> Audio to play on grab </summary>
+    public AudioSource onGrabAudio;
+
+    /// <summary> Audio to play on release </summary>
+    public AudioSource onReleaseAudio;
+
     /// <summary> Rigidbody of the item </summary>
     [HideInInspector]
     public Rigidbody rb;
@@ -34,6 +45,16 @@ public class Grabbable : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        onGrab += (_) =>
+        {
+            if (onGrabAudio != null && onGrabAudio.clip != null)
+                onGrabAudio?.Play();
+        };
+        onRelease += (_) =>
+        {
+            if (onReleaseAudio != null && onReleaseAudio.clip != null)
+                onReleaseAudio?.Play();
+        };
     }
 
     private void OnTriggerEnter(Collider other)

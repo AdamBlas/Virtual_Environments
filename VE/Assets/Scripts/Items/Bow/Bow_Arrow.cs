@@ -85,13 +85,14 @@ public class Bow_Arrow : MonoBehaviour
             {
                 this.transform.position = hit.point - ((newPos - lastPos).normalized * arrowsLength * .3f);
                 
-                if (hit.collider.tag.Equals("Target"))
+                if (hit.collider.CompareTag("Target"))
                 {
-                    parent = hit.collider.transform;
-                    posOffset = this.transform.position - parent.transform.position;
-                    rotOffset = this.transform.rotation.eulerAngles - parent.transform.rotation.eulerAngles;
-
+                    SetParent(hit.collider.transform);
                     hit.collider.GetComponent<ShootingTarget>().AnalyzeHit(hit.point);
+                }
+                else if (hit.collider.CompareTag("Movable Terrain"))
+                {
+                    SetParent(hit.collider.transform);
                 }
 
                 yield break;
@@ -102,6 +103,13 @@ public class Bow_Arrow : MonoBehaviour
             lastPos = newPos;
             yield return null;
         }
+    }
+
+    void SetParent(Transform parent)
+    {
+        this.parent = parent;
+        posOffset = this.transform.position - parent.transform.position;
+        rotOffset = this.transform.rotation.eulerAngles - parent.transform.rotation.eulerAngles;
     }
 
     Vector3 CalculatePosition(Vector3 prevPos, float deltaTime, float velocity)

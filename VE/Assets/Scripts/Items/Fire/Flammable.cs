@@ -5,26 +5,27 @@ using UnityEngine;
 public class Flammable : MonoBehaviour
 {
     [SerializeField]
+    ParticleSystem particles;
+    [SerializeField]
+    Light lightSource;
+    [SerializeField]
+    AudioSource audioSource;
+    
+
+    [Space]
+
+    [SerializeField]
     private bool isLit;
     public bool IsLit { get => isLit; set => isLit = value; }
-    ParticleSystem particles;
-    Light lightSource;
+
+    
 
     void Start()
     {
-        particles = GetComponent<ParticleSystem>();
-        lightSource = transform.parent.GetComponentInChildren<Light>();
-
         if (isLit)
-        {
-            particles.Play();
-            lightSource.enabled = true;
-        }
+            LightFire();
         else
-        {
-            particles.Stop();
-            lightSource.enabled = false;
-        }
+            ExtinguishFire();
     }
 
     public void LightFire()
@@ -32,6 +33,7 @@ public class Flammable : MonoBehaviour
         isLit = true;
         lightSource.enabled = true;
         particles.Play();
+        audioSource.Play();
     }
 
     public void ExtinguishFire()
@@ -39,6 +41,7 @@ public class Flammable : MonoBehaviour
         isLit = false;
         lightSource.enabled = false;
         particles.Stop();
+        audioSource.Stop();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -47,7 +50,6 @@ public class Flammable : MonoBehaviour
         {
             if (!isLit)
             {
-                isLit = true;
                 LightFire();
                 Invoke("ExtinguishFire", 5);
             }

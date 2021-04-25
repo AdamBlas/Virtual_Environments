@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TargetMovement : MonoBehaviour
+public class SinMovement : MonoBehaviour
 {
     Vector3 startPoint;
 

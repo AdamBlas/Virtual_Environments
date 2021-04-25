@@ -16,6 +16,8 @@ public class Bow_BowstringGrabber : MonoBehaviour
     float zRescaler = .3f;
     public Transform model;
 
+
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("RightHand"))
@@ -33,20 +35,23 @@ public class Bow_BowstringGrabber : MonoBehaviour
 
     void Start()
     {
-        pointZero = this.transform.localPosition;
-        GetComponentInParent<Grabbable>().onRelease += DropArrow;
-        bowstringLimit -= bowstringLimit * zRescaler;
+        pointZero = this.transform.localPosition;                       // Get default position
+        GetComponentInParent<Grabbable>().onRelease += DropArrow;       // If bow is dropped when arrow is on bowstring, drop arrow
+        bowstringLimit -= bowstringLimit * zRescaler;                   // Recalculate limit, so it isn't affected by rescaling 
     }
 
     void Update()
     {
+        // If player grabbed bowstring
         if (isInside && RightHand.Trigger.Down)
         {
+            // If player is holding arrow in his hand, put that arrow on bowstring
             if (RightHand.grabber.heldItem != null && RightHand.grabber.heldItem.tag.Equals("Arrow"))
             {
                 PutAnArronOnBowstring();
             }
 
+            // Start coroutine responsible for adjusting bowstring position
             StartCoroutine(HoldBowstring());
         }
     }
@@ -72,8 +77,10 @@ public class Bow_BowstringGrabber : MonoBehaviour
                 diff = 0;
             }
 
+            // Remap value to 0-1 range
             float strength = (diff / bowstringLimit);
 
+            // Rescale bow
             float xScale = 1 - strength * xRescaler;
             float zScale = 1 + strength * zRescaler;
             model.localScale = new Vector3(xScale, 1, zScale);
@@ -93,7 +100,7 @@ public class Bow_BowstringGrabber : MonoBehaviour
             }
 
             // Draw path
-            arrowComp?.MarkPath(diff / Time.deltaTime);
+            //arrowComp?.MarkPath(diff / Time.deltaTime);
 
             yield return null;
         }
@@ -113,13 +120,20 @@ public class Bow_BowstringGrabber : MonoBehaviour
 
     void ReleaseBowstring(float strength)
     {
+        // Calculate velocity
         float velocity = strength / Time.deltaTime;
+
+        // Reset position
         this.transform.localPosition = pointZero;
+
+        // Reset bow's rescale
         model.localScale = Vector3.one;
 
+        // Send short, strong impulse to hand devices
         RightHand.Vibrate(0, .1f, 200, strength);
         LeftHand.Vibrate(0, .1f, 200, strength);
 
+        // If arrow was loaded
         if (arrowComp != null)
         {
             arrowGrab.onGrab -= arrowComp.OnGrab;
