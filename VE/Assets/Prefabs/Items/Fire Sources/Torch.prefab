@@ -4859,6 +4859,7 @@ MonoBehaviour:
   lightSource: {fileID: 2060070144979253588}
   audioSource: {fileID: 3471635234646527559}
   isLit: 0
+  minLightIntensity: 0.6
 --- !u!82 &3471635234646527559
 AudioSource:
   m_ObjectHideFlags: 0
@@ -4975,7 +4976,7 @@ Light:
   serializedVersion: 10
   m_Type: 2
   m_Shape: 0
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.990566, g: 0.97952455, b: 0.2663314, a: 1}
   m_Intensity: 1
   m_Range: 1
   m_SpotAngle: 30

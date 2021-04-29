@@ -63,42 +63,41 @@ public class DayTimeController : MonoBehaviour
         }
 
         currInGameTime += diff / 50;
+        currInGameTime += 24;
         currInGameTime %= 24;
-        currInGameTime = Mathf.Abs(currInGameTime);
 
         prevAngle = angle;
-        print("Hour: " + currInGameTime);
+        //print("Hour: " + currInGameTime);
         SetLightColor();
     }
 
     void SetLightColor()
     {
-        float intensity = Toolbox.Remap01(-Mathf.Abs(currInGameTime - 12) + 12, 0, 12);
-        directionalLight.intensity = intensity * .9f + .1f;
-        RenderSettings.ambientIntensity = intensity * .9f + .1f;
-
+        float intensity;
 
         if (currInGameTime < 4 || currInGameTime > 20)
         {
             // Night
             Camera.main.backgroundColor = skyboxNightColor;
             directionalLight.color = sunNightColor;
+            intensity = 0;
         }
         else if (currInGameTime < 8)
         {
             // Dawn
             float remap = Toolbox.Remap01(currInGameTime, 4, 8);
             Camera.main.backgroundColor = Color.Lerp(skyboxNightColor, skyboxDayColor, remap);
+            intensity = remap;
 
             if (currInGameTime < 6)
             {
                 // Early dawn
-                directionalLight.color = Color.Lerp(sunNightColor, sunDawnColor, remap / 2);
+                directionalLight.color = Color.Lerp(sunNightColor, sunDawnColor, remap * 2);
             }
             else
             {
                 // Late dawn
-                directionalLight.color = Color.Lerp(sunDawnColor, sunNoonColor, remap / 2 + .5f);
+                directionalLight.color = Color.Lerp(sunDawnColor, sunNoonColor, (remap - .5f) * 2);
             }
         }
         else if (currInGameTime < 16)
@@ -106,23 +105,29 @@ public class DayTimeController : MonoBehaviour
             // Day
             Camera.main.backgroundColor = skyboxDayColor;
             directionalLight.color = sunNoonColor;
+            intensity = 1;
         }
         else
         {
             // Dusk
             float remap = Toolbox.Remap01(currInGameTime, 16, 20);
             Camera.main.backgroundColor = Color.Lerp(skyboxDayColor, skyboxNightColor, remap);
+            intensity = -remap + 1;
 
             if (currInGameTime < 18)
             {
                 // Early dusk
-                directionalLight.color = Color.Lerp(sunNoonColor, sunDuskColor, remap / 2);
+                directionalLight.color = Color.Lerp(sunNoonColor, sunDuskColor, remap * 2);
             }
             else
             {
                 // Late dusk
-                directionalLight.color = Color.Lerp(sunDuskColor, sunNightColor, remap / 2 + .5f);
+                directionalLight.color = Color.Lerp(sunDuskColor, sunNightColor, (remap - .5f) * 2);
             }
         }
+
+        intensity = intensity * .9f + .1f;
+        directionalLight.intensity = intensity;
+        RenderSettings.ambientIntensity = intensity;
     }
 }
