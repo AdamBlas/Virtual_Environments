@@ -47,6 +47,7 @@ public class VRController : MonoBehaviour
             /// <summary> Constructor </summary>
             /// <param name="hand"> Hand that device is assigned to </param>
             /// <param name="button"> Assigned button </param>
+            /// <param name="device"> Assigned device </param>
             public BoolButton(SteamVR_Input_Sources hand, SteamVR_Action_Boolean button, Device device)
             {
                 this.hand = hand;
@@ -56,7 +57,7 @@ public class VRController : MonoBehaviour
 
             /// <summary> Method that is supposed to be invoked every frame </summary>
             public void Update()
-            { 
+            {
                 // Get current status of the button
                 bool currentValue = button.GetState(hand);
 
@@ -93,6 +94,93 @@ public class VRController : MonoBehaviour
             }
         }
 
+
+        public class Vec2Button
+        {
+            /// <summary> Assigned hand </summary>
+            private SteamVR_Input_Sources hand;
+
+            /// <summary> Assigned device </summary>
+            private Device device;
+
+            /// <summary> Assigned vector input </summary>
+            private SteamVR_Action_Vector2 vector;
+
+            /// <summary> Vector showing first position in current session </summary>
+            public Vector2 startValue { get; private set; }
+
+            /// <summary> Vector showing previous registered position </summary>
+            public Vector2 previousValue { get; private set; }
+
+            /// <summary> Vector showing current registered position </summary>
+            public Vector2 currentValue { get; private set; }
+
+            /// <summary> Flag indication whether movement occured (current value is different than previous one) </summary>
+            public bool moved { get; private set; }
+
+            /// <summary> Minimum distance between current and previous value for move to be registered </summary>
+            public float diff { get; private set; }
+
+            /// <summary> Delegate invoked when position is starting to be registered </summary>
+            public Toolbox.void_DeviceVec2 onStart;
+
+            /// <summary> Delegate invoked when position is registered </summary>
+            public Toolbox.void_DeviceVec2 onHold;
+
+            /// <summary> Delegate invoked when position is registered and current one is different that previous one </summary>
+            public Toolbox.void_DeviceVec2 onMove;
+
+            /// <summary> Delegate invoked when position is registered last time, right after release </summary>
+            public Toolbox.void_DeviceVec2 onEnd;
+
+
+
+            /// <summary> Constructor </summary>
+            /// <param name="hand"> Hand that device is assigned to </param>
+            /// <param name="vector"> Assigned vector </param>
+            /// <param name="device"> Assigend device </param>
+            /// <param name="diff"> Minimum difference for movement to be registered </param>
+            public Vec2Button(SteamVR_Input_Sources hand, SteamVR_Action_Vector2 vector, Device device, float diff)
+            {
+                this.hand = hand;
+                this.vector = vector;
+                this.device = device;
+                this.diff = diff;
+            }
+
+            /// <summary> Method that is supposed to be invoked on bigining of registering position </summary>
+            public void Start()
+            {
+                startValue = vector.GetAxis(hand);
+                previousValue = startValue;
+                onStart?.Invoke(device, startValue);
+            }
+            /// <summary> Method that is supposed to be invoked every frame </summary>
+            public void Update()
+            {
+                // Get current status of the axis
+                currentValue = vector.GetAxis(hand);
+                onHold?.Invoke(device, currentValue);
+
+                // Check if there is a difference
+                if (Vector2.Distance(currentValue, previousValue) > diff)
+                {
+                    moved = true;
+                    onMove?.Invoke(device, currentValue);
+                    previousValue = currentValue;
+                }
+                else
+                {
+                    moved = false;
+                }
+            }
+            /// <summary> Method that is supposed to be invoked when position is no longer registered </summary>
+            public void End()
+            {
+                onEnd?.Invoke(device, previousValue);
+            }
+        }
+
         /// <summary> Assigned GameObject </summary>
         public GameObject gameObject { get; private set; }
 
@@ -117,6 +205,12 @@ public class VRController : MonoBehaviour
         /// <summary> BoolButton object representing Touchpad (only detects if pad is pressed, not area touched) </summary>
         public BoolButton TouchpadButton { get; private set; }
 
+        /// <summary> BoolButton object representing Touchpad Touch </summary>
+        public BoolButton TouchpadTouch { get; private set; }
+
+        /// <summary> BoolButton object representing Touchpad Position </summary>
+        public Vec2Button TouchpadPos { get; private set; }
+
 
 
         /// <summary> Constructor of the Device class </summary>
@@ -134,6 +228,8 @@ public class VRController : MonoBehaviour
             Grip = new BoolButton(hand, SteamVR_Actions.Averagers_Model.Grip, this);
             Button = new BoolButton(hand, SteamVR_Actions.Averagers_Model.Button_1, this);
             TouchpadButton = new BoolButton(hand, SteamVR_Actions.Averagers_Model.Touchpad_Button, this);
+            TouchpadTouch = new BoolButton(hand, SteamVR_Actions.Averagers_Model.Touchpad_Touch, this);
+            TouchpadPos = new Vec2Button(hand, SteamVR_Actions.averagers_Model_Touchpad_Position, this, .1f);
         }
 
         /// <summary> Update function that is supposed to be invoked every frame </summary>
@@ -143,6 +239,14 @@ public class VRController : MonoBehaviour
             Grip.Update();
             Button.Update();
             TouchpadButton.Update();
+            TouchpadTouch.Update();
+
+            if (TouchpadTouch.Down)
+                TouchpadPos.Start();
+            else if (TouchpadTouch.Hold)
+                TouchpadPos.Update();
+            else if (TouchpadTouch.Released)
+                TouchpadPos.End();
         }
 
         public void Vibrate(float delay, float duration, float frequency, float amplitude)
@@ -164,6 +268,12 @@ public class VRController : MonoBehaviour
 
             if (TouchpadButton.Down)
                 print(name + " touchpad pressed.");
+
+            if (TouchpadTouch.Down)
+                print(name + " touchpad touched.");
+
+            if (TouchpadPos.moved)
+                print(name + " touchpad moved to position: " + TouchpadPos.currentValue);
         }
     }
 

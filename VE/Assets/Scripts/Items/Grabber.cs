@@ -59,9 +59,9 @@ public class Grabber : MonoBehaviour
     {
         vc = GetComponent<VelocityCalculator>();
 
-        if (gameObject.tag.Equals("LeftHand"))
+        if (gameObject.CompareTag("LeftHand"))
             device = VRController.LeftHand;
-        else if (gameObject.tag.Equals("RightHand"))
+        else if (gameObject.CompareTag("RightHand"))
             device = VRController.RightHand;
         else
             throw new System.InvalidOperationException("Unknown device");
@@ -69,7 +69,7 @@ public class Grabber : MonoBehaviour
     void Update()
     {
         // If grip is pressed, invoke proper method
-        if (device.Grip.Down)
+        if (device != null && device.Grip.Down)
         {
             if (heldItem == null)
                 GrabItem();
