@@ -17,4 +17,28 @@ public static class Toolbox
     {
         return Remap(value, from, to, 0, 1);
     }
+    public static bool PlaySound(AudioSource source, AudioClip clip=null)
+    {
+        if (source != null && (source.clip != null || clip != null))
+        {
+            if (clip != null)
+                source.clip = clip;
+            source.Play();
+            return true;
+        }
+        return false;
+    }
+    public static bool PlayRandomSound(AudioSource source, List<AudioClip> clips)
+    {
+        return PlaySound(source, clips[Random.Range(0, clips.Count)]);
+    }
+    public static bool StopSound(AudioSource source)
+    {
+        if (source != null && source.isPlaying)
+        {
+            source.Stop();
+            return true;
+        }
+        return false;
+    }
 }

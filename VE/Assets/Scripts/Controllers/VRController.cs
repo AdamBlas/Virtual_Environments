@@ -94,7 +94,7 @@ public class VRController : MonoBehaviour
             }
         }
 
-
+        /// <summary> Container class for vector2-valued buttons. </summary>
         public class Vec2Button
         {
             /// <summary> Assigned hand </summary>
@@ -211,7 +211,8 @@ public class VRController : MonoBehaviour
         /// <summary> BoolButton object representing Touchpad Position </summary>
         public Vec2Button TouchpadPos { get; private set; }
 
-
+        /// <summary> Other hand. </summary>
+        public Device other { get; private set; }
 
         /// <summary> Constructor of the Device class </summary>
         /// <param name="hand"> Assigned device </param>
@@ -232,7 +233,15 @@ public class VRController : MonoBehaviour
             TouchpadPos = new Vec2Button(hand, SteamVR_Actions.averagers_Model_Touchpad_Position, this, .1f);
         }
 
-        /// <summary> Update function that is supposed to be invoked every frame </summary>
+        /// <summary> Assigns value to 'other' variable </summary>
+        public void AssignOther()
+        {
+            if (Equals(RightHand))
+                other = LeftHand;
+            other = RightHand;
+        }
+
+        /// <summary> Update function that is supposed to be invoked every frame. </summary>
         public void Update()
         {
             Trigger.Update();
@@ -249,12 +258,17 @@ public class VRController : MonoBehaviour
                 TouchpadPos.End();
         }
 
+        /// <summary> Make device vibrate </summary>
+        /// <param name="delay"> Device will start vibriting after 'delay' seconds </param>
+        /// <param name="duration"> How long will device vibrate </param>
+        /// <param name="frequency"> Frequency of vibration (low - vibrations like pneumatoc hammer, high - vibrations like elecric toothbrush) </param>
+        /// <param name="amplitude"> Amplitude of vibration (strength) </param>
         public void Vibrate(float delay, float duration, float frequency, float amplitude)
         {
             SteamVR_Actions.Averagers_Model.Haptic.Execute(delay, duration, frequency, amplitude, hand);
         }
 
-        /// <summary> Prints pressed buttons on console </summary>
+        /// <summary> Prints pressed buttons on console. </summary>
         public void DebugDevice()
         {
             if (Trigger.Down)
@@ -294,6 +308,9 @@ public class VRController : MonoBehaviour
     {
         LeftHand = new Device(SteamVR_Input_Sources.LeftHand, "Left hand", GameObject.FindGameObjectWithTag("LeftHand"));
         RightHand = new Device(SteamVR_Input_Sources.RightHand, "Right hand", GameObject.FindGameObjectWithTag("RightHand"));
+
+        LeftHand.AssignOther();
+        RightHand.AssignOther();
     }
     void Update()
     {

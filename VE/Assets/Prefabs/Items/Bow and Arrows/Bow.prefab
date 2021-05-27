@@ -271,7 +271,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canBeGrabbedWithLeftHand: 1
-  canBeGrabbedWithRightHand: 0
+  canBeGrabbedWithRightHand: 1
   resetRotationWhileGrabbed: 1
   rotationBase: {x: 90, y: 0, z: 90}
   onGrabAudio: {fileID: 279715737664699566}
@@ -787,7 +787,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   model: {fileID: 3198913195844715661}
-  drawAudio: {fileID: 4995276036443389753}
 --- !u!82 &4995276036443389753
 AudioSource:
   m_ObjectHideFlags: 0

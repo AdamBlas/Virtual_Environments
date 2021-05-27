@@ -16,13 +16,18 @@ public class Blinker : MonoBehaviour
 
     /// <summary> GameObject that is supposed to blink (player by default) </summary>
     GameObject player;
-    
 
+    /// <summary> Audio Source </summary>
+    AudioSource audioSource;
+
+    /// <summary> Clips to play on blink </summary>
+    public List<AudioClip> onBlinkClips;
 
     void Start()
     {
         // Find player object
         player = GameObject.FindGameObjectWithTag("Player");
+        audioSource = GetComponent<AudioSource>();
         RightHand.TouchpadButton.onDown += ShowRay;
         RightHand.TouchpadButton.onRelease += TryToBlink;
     }
@@ -45,6 +50,7 @@ public class Blinker : MonoBehaviour
                 // Camera position is not equal to player position (moving in real world doesn't change player's position, only camera's offset)
                 // So for player to appear in pointed location, we have to sutract that offset from location's position
                 player.transform.position = new Vector3(hit.point.x - Camera.main.transform.localPosition.x, 0, hit.point.z - Camera.main.transform.localPosition.z);
+                Toolbox.PlayRandomSound(audioSource, onBlinkClips);
             }
 
             Destroy(ray);

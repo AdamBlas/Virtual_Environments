@@ -3,33 +3,55 @@ using System.Collections.Generic;
 using UnityEngine;
 using static VRController;
 
+/// <summary>
+/// Component that allows bowstring to be grabbed and pulled.
+/// </summary>
 public class Bow_BowstringGrabber : MonoBehaviour
 {
+    /// <summary> How much bowstring can be pulled. </summary>
     float bowstringLimit = 4f;
 
-    bool isInside = false;
+    /// <summary> Flag that indicates if right hand is touching the bowstring. </summary>
+    bool isRightInside = false;
+    /// <summary> Flag that indicates if left hand is touching the bowstring. </summary>
+    bool isLeftInside = false;
+    /// <summary> Point of bowstring in idle mode. </summary>
     private Vector3 pointZero;
+    /// <summary> Grabbable component of arrow on bowstring. </summary>
     private Grabbable arrowGrab;
+    /// <summary> Arrow component of arrow on bowstring. </summary>
     private Bow_Arrow arrowComp;
 
+    /// <summary> How much bow should shrink in Y scale while on max pull. </summary>
     float xRescaler = .2f;
+    /// <summary> How much bow should lengthen in Z scale while on max pull. </summary>
     float zRescaler = .3f;
+    /// <summary> Bow model. </summary>
     public Transform model;
 
+    Device device;
 
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("RightHand"))
         {
-            isInside = true;
+            isRightInside = true;
+        }
+        else if (other.CompareTag("LeftHand"))
+        {
+            isLeftInside = true;
         }
     }
     private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("RightHand"))
         {
-            isInside = false;
+            isRightInside = false;
+        }
+        else if (other.CompareTag("LeftHand"))
+        {
+            isLeftInside = false;
         }
     }
 
@@ -38,15 +60,19 @@ public class Bow_BowstringGrabber : MonoBehaviour
         pointZero = this.transform.localPosition;                       // Get default position
         GetComponentInParent<Grabbable>().onRelease += DropArrow;       // If bow is dropped when arrow is on bowstring, drop arrow
         bowstringLimit -= bowstringLimit * zRescaler;                   // Recalculate limit, so it isn't affected by rescaling 
+        RightHand.Trigger.onDown += OnTriggerDown;                      // Add events to trigger presses
+        LeftHand.Trigger.onDown += OnTriggerDown;
     }
 
-    void Update()
+    void OnTriggerDown(Device d)
     {
         // If player grabbed bowstring
-        if (isInside && RightHand.Trigger.Down)
+        if ((isRightInside && d.Equals(RightHand)) || (isLeftInside && d.Equals(LeftHand)))
         {
+            device = d;
+
             // If player is holding arrow in his hand, put that arrow on bowstring
-            if (RightHand.grabber.heldItem != null && RightHand.grabber.heldItem.tag.Equals("Arrow"))
+            if (d.grabber.heldItem != null && d.grabber.heldItem.CompareTag("Arrow"))
             {
                 PutAnArronOnBowstring();
             }
@@ -61,7 +87,7 @@ public class Bow_BowstringGrabber : MonoBehaviour
         while (true)
         {
             // Calculate how far bowstring is pulled
-            this.transform.position = RightHand.gameObject.transform.position;
+            this.transform.position = device.gameObject.transform.position;
             this.transform.localPosition = new Vector3(0, 0, this.transform.localPosition.z);
             float diff = pointZero.z - this.transform.localPosition.z;
 
@@ -86,7 +112,7 @@ public class Bow_BowstringGrabber : MonoBehaviour
             model.localScale = new Vector3(xScale, 1, zScale);
 
             // If bowstring is released
-            if (RightHand.Trigger.Released)
+            if (device.Trigger.Released)
             {
                 ReleaseBowstring(strength);
                 yield break;
@@ -108,14 +134,14 @@ public class Bow_BowstringGrabber : MonoBehaviour
 
     void PutAnArronOnBowstring()
     {
-        arrowGrab = RightHand.grabber.heldItem;
-        arrowComp = arrowGrab.GetComponent<Bow_Arrow>();
-        arrowGrab.onGrab += arrowComp.OnGrab;
-        RightHand.grabber.LetItemGo();
-        arrowGrab.DisablePhysics();
-        arrowGrab.transform.SetParent(this.transform);
-        arrowGrab.transform.localPosition = Vector3.zero;
-        arrowGrab.transform.localRotation = Quaternion.Euler(90, 0, 0);
+        arrowGrab = device.grabber.heldItem;                                // Get Component
+        arrowComp = arrowGrab.GetComponent<Bow_Arrow>();                    // Get Component
+        arrowGrab.onGrab += arrowComp.OnGrab;                               // Move event to arrow component
+        device.grabber.LetItemGo();                                         // Drop arrow from hand
+        arrowGrab.DisablePhysics();                                         // Disable arrow physics
+        arrowGrab.transform.SetParent(this.transform);                      // ====
+        arrowGrab.transform.localPosition = Vector3.zero;                   // Set arrow as child of bowstring
+        arrowGrab.transform.localRotation = Quaternion.Euler(90, 0, 0);     // ====
     }
 
     void ReleaseBowstring(float strength)
@@ -149,8 +175,8 @@ public class Bow_BowstringGrabber : MonoBehaviour
     }
     void CancelShot()
     {
-        RightHand.grabber.hoveredItem = arrowGrab;
-        RightHand.grabber.GrabItem();
+        device.grabber.hoveredItems.Add(arrowGrab);
+        device.grabber.GrabItem();
         arrowComp.ClearPath();
     }
     void DropArrow(Grabber _)

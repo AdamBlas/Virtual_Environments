@@ -11,6 +11,9 @@ public class Button : MonoBehaviour
     float pressOffset = 0.02f;
     Transform cylinder;
 
+    AudioSource audioSource;
+    public List<AudioClip> onPressClips;
+
     void Start()
     {
         foreach (Transform t in this.transform)
@@ -24,6 +27,9 @@ public class Button : MonoBehaviour
 
         if (cylinder == null)
             throw new MissingReferenceException("Cannot find cilinder representing pressable part of button.");
+
+        audioSource = GetComponent<AudioSource>();
+        onPress += (() => Toolbox.PlayRandomSound(audioSource, onPressClips));
     }
 
     private void OnTriggerEnter(Collider other)

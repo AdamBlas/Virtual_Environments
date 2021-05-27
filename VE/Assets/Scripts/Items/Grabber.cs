@@ -1,19 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static VRController;
 
+/// <summary>
+/// GameObjects with this component can grab Grabbable objects
+/// </summary>
 public class Grabber : MonoBehaviour
 {
     /// <summary> Assigned device </summary>
     private VRController.Device device;
 
     /// <summary> GameObject that grabber is currently holding </summary>
-    [HideInInspector]
     public Grabbable heldItem { get; private set; }
 
     /// <summary> GameObject that will be grabbed if such command is registered </summary>
     [HideInInspector]
-    public Grabbable hoveredItem;
+    public List<Grabbable> hoveredItems = new List<Grabbable>();
+
+    /// <summary> BoolButton that is responsible for grabbing </summary>
+    private Device.BoolButton grabButton;
 
     /// <summary> Grabber's Velocity Calculator </summary>
     VelocityCalculator vc;
@@ -23,11 +29,14 @@ public class Grabber : MonoBehaviour
     public bool GrabItem()
     {
         // If item can't be grabbed (either grabber is already holding something or there is no item to grab), return false
-        if (heldItem != null || hoveredItem == null)
+        if (heldItem != null || hoveredItems.Count == 0)
             return false;
 
-        heldItem = hoveredItem;                                                             // Set hovered item as currently held
-        hoveredItem = null;                                                                 // Reset hovered item
+        heldItem = hoveredItems[hoveredItems.Count - 1];                                    // Set hovered item as currently held
+        hoveredItems.Remove(heldItem);
+        if (device.other.grabber.hoveredItems.Contains(heldItem))
+            device.other.grabber.hoveredItems.Remove(heldItem);
+
         heldItem.DisablePhysics();                                                          // Disable rigidbody
         heldItem.transform.SetParent(this.transform);                                       // Set parent
         heldItem.transform.localPosition = Vector3.zero;                                    // Reset local position
@@ -46,10 +55,11 @@ public class Grabber : MonoBehaviour
         if (heldItem == null)
             return false;
 
+        hoveredItems.Remove(heldItem);
         heldItem.transform.SetParent(null);                       // Unparent item
         heldItem.EnablePhysics();                                 // Enable rigidbidy
         heldItem.rb.velocity = vc.Velocity;                       // Apply current velocity, so the item won't fall straight down, but rather act like it is thrown
-        //holdedItem.rb.angularVelocity = vc.AngularVelocity;         // Apply current angular velocity (results look strange, so comment this line if needed) 
+        //holdedItem.rb.angularVelocity = vc.AngularVelocity;       // Apply current angular velocity (results look strange, so comment this line if needed) 
         heldItem.onRelease?.Invoke(this);                         // Invoke onRelese delegate
         heldItem = null;                                          // Reset held item
         return true;
@@ -65,16 +75,23 @@ public class Grabber : MonoBehaviour
             device = VRController.RightHand;
         else
             throw new System.InvalidOperationException("Unknown device");
+
+        grabButton = device.Grip;
+        grabButton.onDown += OnGrabPress;
     }
-    void Update()
+
+    void ChangeGrabButton(Device.BoolButton newButton)
     {
-        // If grip is pressed, invoke proper method
-        if (device != null && device.Grip.Down)
-        {
-            if (heldItem == null)
-                GrabItem();
-            else
-                LetItemGo();
-        }
+        grabButton.onDown -= OnGrabPress;
+        grabButton = newButton;
+        grabButton.onDown += OnGrabPress;
+    }
+
+    void OnGrabPress(Device _)
+    {
+        if (heldItem == null)
+            GrabItem();
+        else
+            LetItemGo();
     }
 }

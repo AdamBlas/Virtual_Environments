@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// GameObjects with this component can be grabbed by player
+/// </summary>
 public class Grabbable : MonoBehaviour
 {
     [Header("Interaction variables")]
@@ -45,27 +48,18 @@ public class Grabbable : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        onGrab += (_) =>
-        {
-            if (onGrabAudio != null && onGrabAudio.clip != null)
-                onGrabAudio?.Play();
-        };
-        onRelease += (_) =>
-        {
-            if (onReleaseAudio != null && onReleaseAudio.clip != null)
-                onReleaseAudio?.Play();
-        };
+        onGrab += (_) => Toolbox.PlaySound(onGrabAudio);
+        onRelease += (_) => Toolbox.PlaySound(onReleaseAudio);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (IsConditionMet(other))
         {
-            // If registered collider was right hand, assign itself to its grabber, so the grabber will know that this is the item...
+            // If registered collider was hand, assign itself to its grabber, so the grabber will know that this is the item...
             // ...that is supposed to be grabbed
-
             grabber = other.GetComponent<Grabber>();
-            grabber.hoveredItem = this;
+            grabber.hoveredItems.Add(this);
         }
     }
 
@@ -74,8 +68,8 @@ public class Grabbable : MonoBehaviour
         if (IsConditionMet(other))
         {
             // If hand leaves the collider area, remove traces of itself if needed
-            if (grabber != null && grabber.hoveredItem == this)
-                grabber.hoveredItem = null;
+            if (grabber != null && grabber.hoveredItems.Contains(this))
+                grabber.hoveredItems.Remove(this);
         }
     }
 

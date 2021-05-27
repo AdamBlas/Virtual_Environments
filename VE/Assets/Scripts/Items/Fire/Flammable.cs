@@ -70,7 +70,6 @@ public class Flammable : MonoBehaviour
         {
             lightSource.intensity -= step;
             yield return new WaitForSeconds(0.1f);
-            print("Intensity: " + lightSource.intensity);
         }
         lightSource.enabled = false;
     }

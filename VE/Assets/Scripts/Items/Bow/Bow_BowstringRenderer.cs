@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bow_BowstringDrawer : MonoBehaviour
+public class Bow_BowstringRenderer : MonoBehaviour
 {
     [SerializeField]
     private Transform pointA;
