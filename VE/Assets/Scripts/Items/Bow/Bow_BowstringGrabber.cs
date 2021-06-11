@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static VRController;
 
 /// <summary>
 /// Component that allows bowstring to be grabbed and pulled.
@@ -29,8 +28,7 @@ public class Bow_BowstringGrabber : MonoBehaviour
     /// <summary> Bow model. </summary>
     public Transform model;
 
-    Device device;
-
+    VRDevice device;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -60,19 +58,19 @@ public class Bow_BowstringGrabber : MonoBehaviour
         pointZero = this.transform.localPosition;                       // Get default position
         GetComponentInParent<Grabbable>().onRelease += DropArrow;       // If bow is dropped when arrow is on bowstring, drop arrow
         bowstringLimit -= bowstringLimit * zRescaler;                   // Recalculate limit, so it isn't affected by rescaling 
-        RightHand.Trigger.onDown += OnTriggerDown;                      // Add events to trigger presses
-        LeftHand.Trigger.onDown += OnTriggerDown;
+        PlayersManager.RightHand.Trigger.onDown += OnTriggerDown;                      // Add events to trigger presses
+        PlayersManager.LeftHand.Trigger.onDown += OnTriggerDown;
     }
 
-    void OnTriggerDown(Device d)
+    void OnTriggerDown(VRDevice d)
     {
         // If player grabbed bowstring
-        if ((isRightInside && d.Equals(RightHand)) || (isLeftInside && d.Equals(LeftHand)))
+        if ((isRightInside && d.Hand == Valve.VR.SteamVR_Input_Sources.RightHand) || (isLeftInside && d.Hand == Valve.VR.SteamVR_Input_Sources.LeftHand))
         {
             device = d;
 
             // If player is holding arrow in his hand, put that arrow on bowstring
-            if (d.grabber.heldItem != null && d.grabber.heldItem.CompareTag("Arrow"))
+            if (d.Grabber.heldItem != null && d.Grabber.heldItem.CompareTag("Arrow"))
             {
                 PutAnArronOnBowstring();
             }
@@ -87,7 +85,7 @@ public class Bow_BowstringGrabber : MonoBehaviour
         while (true)
         {
             // Calculate how far bowstring is pulled
-            this.transform.position = device.gameObject.transform.position;
+            this.transform.position = device.GameObject.transform.position;
             this.transform.localPosition = new Vector3(0, 0, this.transform.localPosition.z);
             float diff = pointZero.z - this.transform.localPosition.z;
 
@@ -121,8 +119,8 @@ public class Bow_BowstringGrabber : MonoBehaviour
             // Apply vibration
             if (strength > .19f)
             {
-                RightHand.Vibrate(0, Time.deltaTime, 3, Mathf.Pow(strength - .19f, 2));
-                LeftHand.Vibrate(0, Time.deltaTime, 3, Mathf.Pow(strength - .19f, 2));
+                device.Vibrate(0, Time.deltaTime, 3, Mathf.Pow(strength - .19f, 2));
+                device.other.Vibrate(0, Time.deltaTime, 3, Mathf.Pow(strength - .19f, 2));
             }
 
             // Draw path
@@ -134,10 +132,10 @@ public class Bow_BowstringGrabber : MonoBehaviour
 
     void PutAnArronOnBowstring()
     {
-        arrowGrab = device.grabber.heldItem;                                // Get Component
+        arrowGrab = device.Grabber.heldItem;                                // Get Component
         arrowComp = arrowGrab.GetComponent<Bow_Arrow>();                    // Get Component
         arrowGrab.onGrab += arrowComp.OnGrab;                               // Move event to arrow component
-        device.grabber.LetItemGo();                                         // Drop arrow from hand
+        device.Grabber.LetItemGo();                                         // Drop arrow from hand
         arrowGrab.DisablePhysics();                                         // Disable arrow physics
         arrowGrab.transform.SetParent(this.transform);                      // ====
         arrowGrab.transform.localPosition = Vector3.zero;                   // Set arrow as child of bowstring
@@ -156,8 +154,8 @@ public class Bow_BowstringGrabber : MonoBehaviour
         model.localScale = Vector3.one;
 
         // Send short, strong impulse to hand devices
-        RightHand.Vibrate(0, .1f, 200, strength);
-        LeftHand.Vibrate(0, .1f, 200, strength);
+        device.Vibrate(0, .1f, 200, strength);
+        device.other.Vibrate(0, .1f, 200, strength);
 
         // If arrow was loaded
         if (arrowComp != null)
@@ -175,8 +173,8 @@ public class Bow_BowstringGrabber : MonoBehaviour
     }
     void CancelShot()
     {
-        device.grabber.hoveredItems.Add(arrowGrab);
-        device.grabber.GrabItem();
+        device.Grabber.hoveredItems.Add(arrowGrab);
+        device.Grabber.GrabItem();
         arrowComp.ClearPath();
     }
     void DropArrow(Grabber _)

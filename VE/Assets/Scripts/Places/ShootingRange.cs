@@ -14,7 +14,7 @@ public class ShootingRange : MonoBehaviour
         spawnMoreArrowsButton.onPress += SpawnArrows;
     }
 
-    void SpawnArrows()
+    void SpawnArrows(GameObject _)
     {
         float offset = 0.1f;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.XR;
-using static VRController;
+using static VRDevice;
 
 public class Blinker : MonoBehaviour
 {
@@ -28,19 +28,19 @@ public class Blinker : MonoBehaviour
         // Find player object
         player = GameObject.FindGameObjectWithTag("Player");
         audioSource = GetComponent<AudioSource>();
-        RightHand.TouchpadButton.onDown += ShowRay;
-        RightHand.TouchpadButton.onRelease += TryToBlink;
+        PlayersManager.RightHand.TouchpadButton.onDown += ShowRay;
+        PlayersManager.RightHand.TouchpadButton.onRelease += TryToBlink;
     }
 
-    void ShowRay(Device _)
+    void ShowRay(VRDevice device)
     {
         // When right touchpad is pressed, create ray object and assign it to hand object, so it follows hand movement
         ray = GameObject.Instantiate(rayPrefab);                                // Create ray
-        ray.transform.SetParent(VRController.RightHand.gameObject.transform);   // Set its parent
+        ray.transform.SetParent(device.GameObject.transform);                   // Set its parent
         ray.transform.localPosition = Vector3.zero;                             // Reset its local position
         ray.transform.localRotation = Quaternion.Euler(90, 0, 0);               // Reset its local rotation, rotate by 90 degrees so it points in the right direction
     }
-    void TryToBlink(Device _)
+    void TryToBlink(VRDevice _)
     {
         // When right touchpad is released, send raycats to check if ray hit something, blink player if yes, and destroy ray object
         if (ray != null)
@@ -50,7 +50,7 @@ public class Blinker : MonoBehaviour
                 // Camera position is not equal to player position (moving in real world doesn't change player's position, only camera's offset)
                 // So for player to appear in pointed location, we have to sutract that offset from location's position
                 player.transform.position = new Vector3(hit.point.x - Camera.main.transform.localPosition.x, 0, hit.point.z - Camera.main.transform.localPosition.z);
-                Toolbox.PlayRandomSound(audioSource, onBlinkClips);
+                Utils.PlayRandomSound(audioSource, onBlinkClips);
             }
 
             Destroy(ray);

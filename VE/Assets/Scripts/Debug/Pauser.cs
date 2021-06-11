@@ -5,12 +5,9 @@ using UnityEngine;
 public class Pauser : MonoBehaviour
 {
 #if UNITY_EDITOR
-    void Update()
+    void Start()
     {
-        if (VRController.LeftHand.Button.Down)
-        {
-            Debug.Break();
-        }
+        PlayersManager.LeftHand.Button.onDown += _ => Debug.Break();
     }
 #endif
 }

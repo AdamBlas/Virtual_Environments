@@ -50,7 +50,7 @@ public class Bow_Arrow : MonoBehaviour
     {
         ClearPath();
         StartCoroutine(MakeArrowFly(velocity));
-        Toolbox.PlayRandomSound(audioSource, onFlightAudios);
+        Utils.PlayRandomSound(audioSource, onFlightAudios);
     }
 
     /// <summary> Creates marker path that indicates flight path if arrow were to be relased this instant </summary>
@@ -106,8 +106,8 @@ public class Bow_Arrow : MonoBehaviour
             if (Physics.Raycast(origin: lastPos, direction: (newPos - lastPos), maxDistance: distance, layerMask: LayerMask.GetMask("Terrain"), hitInfo: out RaycastHit hit))
             {
                 this.transform.position = hit.point - ((newPos - lastPos).normalized * arrowsLength * .3f);
-                Toolbox.StopSound(audioSource);
-                Toolbox.PlaySound(audioSource, onHitAudio);
+                Utils.StopSound(audioSource);
+                Utils.PlaySound(audioSource, onHitAudio);
                 
                 if (hit.collider.CompareTag("Target"))
                 {

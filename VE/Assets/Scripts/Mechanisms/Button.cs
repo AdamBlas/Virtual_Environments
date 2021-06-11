@@ -5,8 +5,8 @@ using UnityEngine;
 public class Button : MonoBehaviour
 {
     public bool IsPressed { get; private set; }
-    public Toolbox.void_void onPress;
-    public Toolbox.void_void onRelease;
+    public Utils.void_gameObject onPress;
+    public Utils.void_gameObject onRelease;
 
     float pressOffset = 0.02f;
     Transform cylinder;
@@ -26,29 +26,35 @@ public class Button : MonoBehaviour
         }
 
         if (cylinder == null)
-            throw new MissingReferenceException("Cannot find cilinder representing pressable part of button.");
+            throw new MissingReferenceException("Cannot find cylinder representing pressable part of button.");
 
         audioSource = GetComponent<AudioSource>();
-        onPress += (() => Toolbox.PlayRandomSound(audioSource, onPressClips));
+        onPress += ((_) => Utils.PlayRandomSound(audioSource, onPressClips));
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag.Equals("LeftHand") || other.tag.Equals("RightHand"))
+        if (!IsPressed)
         {
-            IsPressed = true;
-            cylinder.localPosition -= new Vector3(0, pressOffset, 0);
-            onPress?.Invoke();
+            if (other.CompareTag("LeftHand") || other.CompareTag("RightHand"))
+            {
+                IsPressed = true;
+                cylinder.localPosition -= new Vector3(0, pressOffset, 0);
+                onPress?.Invoke(this.gameObject);
+            }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.tag.Equals("LeftHand") || other.tag.Equals("RightHand"))
+        if (IsPressed)
         {
-            IsPressed = false;
-            cylinder.localPosition += new Vector3(0, pressOffset, 0);
-            onRelease?.Invoke();
+            if (other.CompareTag("LeftHand") || other.CompareTag("RightHand"))
+            {
+                IsPressed = false;
+                cylinder.localPosition += new Vector3(0, pressOffset, 0);
+                onRelease?.Invoke(this.gameObject);
+            }
         }
     }
 }

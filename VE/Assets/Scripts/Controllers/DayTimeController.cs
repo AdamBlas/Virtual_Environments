@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static VRController;
 
 public class DayTimeController : MonoBehaviour
 {
@@ -12,19 +11,19 @@ public class DayTimeController : MonoBehaviour
 
     /// <summary> Sun color at in-game 6 AM </summary>
     [SerializeField]
-    public Color sunDawnColor;
+    private Color sunDawnColor;
 
     /// <summary> Sun color at in-game 12 AM </summary>
     [SerializeField]
-    public Color sunNoonColor;
+    private Color sunNoonColor;
 
     /// <summary> Sun color at in-game 6 PM </summary>
     [SerializeField]
-    public Color sunDuskColor;
+    private Color sunDuskColor;
 
     /// <summary> "Sun" (Moon) color at in-game 0 AM </summary>
     [SerializeField]
-    public Color sunNightColor;
+    private Color sunNightColor;
 
 
     [Space]
@@ -32,41 +31,38 @@ public class DayTimeController : MonoBehaviour
 
     /// <summary> Skybox color at day </summary>
     [SerializeField]
-    public Color skyboxDayColor;
+    private Color skyboxDayColor;
 
     /// <summary> Skybox color at night </summary>
     [SerializeField]
-    public Color skyboxNightColor;
+    private Color skyboxNightColor;
 
-
-    float prevAngle = 0;
+    Color currBackgroundColor;
     float currInGameTime = 12;
 
     void Start()
     {
-        LeftHand.TouchpadPos.onMove += ManageTime;
+        PlayersManager.LeftHand.TouchpadPos.onMove += ManageTime;
         SetLightColor();
     }
 
-    void ManageTime(Device d, Vector2 currPos)
+    void ManageTime(VRDevice d, Vector2 vStart, Vector2 vPrev, Vector2 vCurr)
     {
-        float angle = (Vector2.SignedAngle(-LeftHand.TouchpadPos.startValue, currPos) - 180) * -1;
-        float diff = angle - prevAngle;
+        float angle = (Vector2.SignedAngle(-vPrev, vCurr) - 180) * -1;
 
-        if (diff > 300)
+        if (angle > 300)
         {
-            diff -= 360;
+            angle -= 360;
         }
-        else if (diff < -300)
+        else if (angle < -300)
         {
-            diff += 360;
+            angle += 360;
         }
 
-        currInGameTime += diff / 50;
+        currInGameTime += angle / 50;
         currInGameTime += 24;
         currInGameTime %= 24;
 
-        prevAngle = angle;
         //print("Hour: " + currInGameTime);
         SetLightColor();
     }
@@ -78,15 +74,15 @@ public class DayTimeController : MonoBehaviour
         if (currInGameTime < 4 || currInGameTime > 20)
         {
             // Night
-            Camera.main.backgroundColor = skyboxNightColor;
+            currBackgroundColor = skyboxNightColor;
             directionalLight.color = sunNightColor;
             intensity = 0;
         }
         else if (currInGameTime < 8)
         {
             // Dawn
-            float remap = Toolbox.Remap01(currInGameTime, 4, 8);
-            Camera.main.backgroundColor = Color.Lerp(skyboxNightColor, skyboxDayColor, remap);
+            float remap = Utils.Remap01(currInGameTime, 4, 8);
+            currBackgroundColor = Color.Lerp(skyboxNightColor, skyboxDayColor, remap);
             intensity = remap;
 
             if (currInGameTime < 6)
@@ -103,15 +99,15 @@ public class DayTimeController : MonoBehaviour
         else if (currInGameTime < 16)
         {
             // Day
-            Camera.main.backgroundColor = skyboxDayColor;
+            currBackgroundColor = skyboxDayColor;
             directionalLight.color = sunNoonColor;
             intensity = 1;
         }
         else
         {
             // Dusk
-            float remap = Toolbox.Remap01(currInGameTime, 16, 20);
-            Camera.main.backgroundColor = Color.Lerp(skyboxDayColor, skyboxNightColor, remap);
+            float remap = Utils.Remap01(currInGameTime, 16, 20);
+            currBackgroundColor = Color.Lerp(skyboxDayColor, skyboxNightColor, remap);
             intensity = -remap + 1;
 
             if (currInGameTime < 18)
@@ -129,5 +125,10 @@ public class DayTimeController : MonoBehaviour
         intensity = intensity * .9f + .1f;
         directionalLight.intensity = intensity;
         RenderSettings.ambientIntensity = intensity;
+
+        foreach (var p in PlayersManager.playersList)
+        {
+            p.Camera.backgroundColor = currBackgroundColor;
+        }
     }
 }

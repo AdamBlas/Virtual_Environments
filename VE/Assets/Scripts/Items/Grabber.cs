@@ -1,15 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static VRController;
+using static VRDevice;
 
 /// <summary>
 /// GameObjects with this component can grab Grabbable objects
 /// </summary>
 public class Grabber : MonoBehaviour
 {
+    /// <summary> Assigned player </summary>
+    private PlayerInstance player;
+
     /// <summary> Assigned device </summary>
-    private VRController.Device device;
+    private VRDevice device;
 
     /// <summary> GameObject that grabber is currently holding </summary>
     public Grabbable heldItem { get; private set; }
@@ -19,7 +22,7 @@ public class Grabber : MonoBehaviour
     public List<Grabbable> hoveredItems = new List<Grabbable>();
 
     /// <summary> BoolButton that is responsible for grabbing </summary>
-    private Device.BoolButton grabButton;
+    private VRDevice.BoolButton grabButton;
 
     /// <summary> Grabber's Velocity Calculator </summary>
     VelocityCalculator vc;
@@ -34,8 +37,8 @@ public class Grabber : MonoBehaviour
 
         heldItem = hoveredItems[hoveredItems.Count - 1];                                    // Set hovered item as currently held
         hoveredItems.Remove(heldItem);
-        if (device.other.grabber.hoveredItems.Contains(heldItem))
-            device.other.grabber.hoveredItems.Remove(heldItem);
+        if (device.other.Grabber.hoveredItems.Contains(heldItem))
+            device.other.Grabber.hoveredItems.Remove(heldItem);
 
         heldItem.DisablePhysics();                                                          // Disable rigidbody
         heldItem.transform.SetParent(this.transform);                                       // Set parent
@@ -67,27 +70,28 @@ public class Grabber : MonoBehaviour
 
     void Start()
     {
+        player = GetComponentInParent<PlayerInstance>();
         vc = GetComponent<VelocityCalculator>();
 
         if (gameObject.CompareTag("LeftHand"))
-            device = VRController.LeftHand;
+            device = player.LeftHand;
         else if (gameObject.CompareTag("RightHand"))
-            device = VRController.RightHand;
+            device = player.RightHand;
         else
             throw new System.InvalidOperationException("Unknown device");
 
         grabButton = device.Grip;
-        grabButton.onDown += OnGrabPress;
+        grabButton.events.onDown += OnGrabPress;
     }
 
-    void ChangeGrabButton(Device.BoolButton newButton)
+    void ChangeGrabButton(VRDevice.BoolButton newButton)
     {
-        grabButton.onDown -= OnGrabPress;
+        grabButton.events.onDown -= OnGrabPress;
         grabButton = newButton;
-        grabButton.onDown += OnGrabPress;
+        grabButton.events.onDown += OnGrabPress;
     }
 
-    void OnGrabPress(Device _)
+    void OnGrabPress(VRDevice _)
     {
         if (heldItem == null)
             GrabItem();

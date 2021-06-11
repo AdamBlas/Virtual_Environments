@@ -22,10 +22,10 @@ public class Grabbable : MonoBehaviour
     public Vector3 rotationBase;
 
     /// <summary> Delegate invoked on grab </summary>
-    public Toolbox.void_Grabber onGrab;
+    public Utils.void_Grabber onGrab;
 
     /// <summary> Delegate invoked on relase </summary>
-    public Toolbox.void_Grabber onRelease;
+    public Utils.void_Grabber onRelease;
 
     [Space]
     [Header("Audio properties")]
@@ -48,8 +48,8 @@ public class Grabbable : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        onGrab += (_) => Toolbox.PlaySound(onGrabAudio);
-        onRelease += (_) => Toolbox.PlaySound(onReleaseAudio);
+        onGrab += (_) => Utils.PlaySound(onGrabAudio);
+        onRelease += (_) => Utils.PlaySound(onReleaseAudio);
     }
 
     private void OnTriggerEnter(Collider other)

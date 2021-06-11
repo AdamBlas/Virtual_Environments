@@ -2,12 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Toolbox
+public static class Utils
 {
     public delegate void void_Grabber(Grabber g);
-    public delegate void void_Device(VRController.Device d);
-    public delegate void void_DeviceVec2(VRController.Device d, Vector2 v);
+    public delegate void void_Device(VRDevice d);
+    public delegate void void_DeviceVec2(VRDevice d, Vector2 v);
+    public delegate void void_DeviceVec2x2(VRDevice d, Vector2 vStart, Vector2 vCurr);
+    public delegate void void_DeviceVec2x3(VRDevice d, Vector2 vStart, Vector2 vPrev, Vector2 vCurr);
     public delegate void void_void();
+    public delegate void void_gameObject(GameObject gameObject);
 
     public static float Remap(float value, float from1, float to1, float from2, float to2)
     {
@@ -30,6 +33,8 @@ public static class Toolbox
     }
     public static bool PlayRandomSound(AudioSource source, List<AudioClip> clips)
     {
+        if (source == null || clips == null || clips.Count == 0)
+            return false;
         return PlaySound(source, clips[Random.Range(0, clips.Count)]);
     }
     public static bool StopSound(AudioSource source)
