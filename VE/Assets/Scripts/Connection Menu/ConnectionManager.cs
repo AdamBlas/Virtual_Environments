@@ -28,21 +28,17 @@ public class ConnectionManager : MonoBehaviour
         {
             b.onPress += NumericPress;
         }
+
+        ip = uNetTransport.ConnectAddress + ":" + uNetTransport.ConnectPort;
     }
 
-    public void Host(GameObject _)
-    {
-        SceneManager.LoadScene("TestGround");
-        networkManager.StartHost();
-    }
-
-    public void Connect(GameObject _)
+    public bool SetAddress()
     {
         string[] address = ip.Split(':');
         if (address.Length != 2)
         {
             ipMesh.text = "ERROR validating address: " + ip;
-            return;
+            return false;
         }
 
         // Regex matches correct ip addresses
@@ -51,7 +47,7 @@ public class ConnectionManager : MonoBehaviour
         if (!match.Success)
         {
             ipMesh.text = "ERROR validating ip: " + address[0];
-            return;
+            return false;
         }
 
         // Regex matches correct connection ports
@@ -60,12 +56,26 @@ public class ConnectionManager : MonoBehaviour
         if (!match.Success)
         {
             ipMesh.text = "ERROR validating port: " + address[1];
-            return;
+            return false;
         }
 
         uNetTransport.ConnectAddress = address[0];
         uNetTransport.ConnectPort = int.Parse(address[1]);
+        return true;
+    }
 
+    public void Host(GameObject _)
+    {
+        if (!SetAddress())
+            return;
+        SceneManager.LoadScene("TestGround");
+        networkManager.StartHost();
+    }
+
+    public void Connect(GameObject _)
+    {
+        if (!SetAddress())
+            return;
         NetworkSceneManager.SwitchScene("TestGround");
         networkManager.StartClient();
     }
