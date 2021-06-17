@@ -11,6 +11,7 @@ public class PlayerConnectionManager : MonoBehaviour
 
     private void Awake()
     {
+        DontDestroyOnLoad(this.gameObject);
         pv = GetComponent<PhotonView>();
     }
 
@@ -25,7 +26,6 @@ public class PlayerConnectionManager : MonoBehaviour
     void CreatePlayer()
     {
         PlayerInstance newPlayer = PhotonNetwork.Instantiate(Path.Combine("Prefabs", "PlayerPrefab"), Vector3.zero, Quaternion.identity).GetComponent<PlayerInstance>();
-        newPlayer.pv = pv;
     }
 
 }

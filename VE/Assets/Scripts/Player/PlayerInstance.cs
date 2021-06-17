@@ -18,6 +18,11 @@ public class PlayerInstance : MonoBehaviour
     [HideInInspector]
     public PhotonView pv;
 
+    private void Awake()
+    {
+        pv = GetComponent<PhotonView>();
+    }
+
     void Start()
     {
         if (!pv.IsMine)
