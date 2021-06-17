@@ -15,6 +15,7 @@ public class PlayerInstance : MonoBehaviour
 
     public Camera Camera { get; private set; }
 
+    [HideInInspector]
     public PhotonView pv;
 
     void Start()
