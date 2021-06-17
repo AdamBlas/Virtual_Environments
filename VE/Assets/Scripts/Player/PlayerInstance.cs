@@ -25,16 +25,19 @@ public class PlayerInstance : MonoBehaviour
 
     void Start()
     {
+        Camera = GetComponentInChildren<Camera>();
+
         if (!pv.IsMine)
-            return;
+        {
+            Destroy(Camera);
+            Destroy(Camera.gameObject.GetComponent<AudioListener>());
+        }
 
         LeftHand = new VRDevice(SteamVR_Input_Sources.LeftHand, "Left hand", transform.Find("Controller (left)").gameObject, this);
         RightHand = new VRDevice(SteamVR_Input_Sources.RightHand, "Right hand", transform.Find("Controller (right)").gameObject, this);
 
         LeftHand.AssignOther(RightHand);
         RightHand.AssignOther(LeftHand);
-
-        Camera = GetComponentInChildren<Camera>();
 
         PlayersManager.AddPlayer(this);
     }
