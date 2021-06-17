@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
+using Photon.Pun;
 
 /// <summary> Represents single player instance </summary>
 public class PlayerInstance : MonoBehaviour
@@ -14,8 +15,13 @@ public class PlayerInstance : MonoBehaviour
 
     public Camera Camera { get; private set; }
 
+    public PhotonView pv;
+
     void Start()
     {
+        if (!pv.IsMine)
+            return;
+
         LeftHand = new VRDevice(SteamVR_Input_Sources.LeftHand, "Left hand", transform.Find("Controller (left)").gameObject, this);
         RightHand = new VRDevice(SteamVR_Input_Sources.RightHand, "Right hand", transform.Find("Controller (right)").gameObject, this);
 
@@ -30,6 +36,9 @@ public class PlayerInstance : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!pv.IsMine)
+            return;
+
         LeftHand.Update();
         RightHand.Update();
 

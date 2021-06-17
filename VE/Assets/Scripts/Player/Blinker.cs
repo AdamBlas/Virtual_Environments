@@ -26,7 +26,7 @@ public class Blinker : MonoBehaviour
     void Start()
     {
         // Find player object
-        player = GameObject.FindGameObjectWithTag("Player");
+        player = GetComponent<PlayerInstance>().gameObject;
         audioSource = GetComponent<AudioSource>();
         PlayersManager.RightHand.TouchpadButton.onDown += ShowRay;
         PlayersManager.RightHand.TouchpadButton.onRelease += TryToBlink;

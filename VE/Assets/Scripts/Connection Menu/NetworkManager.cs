@@ -5,16 +5,20 @@ using Photon.Realtime;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
+
+    public Button hostButton;
+    public Button connectButton;
+
     string gameVersion = "1.0.0";
 
     #region CLASS METHODS
 
-    public void Host()
+    public void Host(GameObject _)
     {
         print("Creating room...");
         PhotonNetwork.JoinLobby();
     }
-    public void Connect()
+    public void Connect(GameObject _)
     {
         print("Joining to room...");
         PhotonNetwork.JoinRoom("Room");
@@ -26,6 +30,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     void Start()
     {
+        hostButton.onPress += Host;
+        connectButton.onPress += Connect;
+
         PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.GameVersion = gameVersion;
