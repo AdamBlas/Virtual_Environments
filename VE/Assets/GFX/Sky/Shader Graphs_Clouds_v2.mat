@@ -35,16 +35,16 @@ Material:
     m_Floats:
     - Vector1_1da9aacfa05e44f9bf366e8ab288529c: 0.1
     - Vector1_67b9e2079b744def8f7c0267f4528685: 0.2
-    - Vector1_68e4083b4fa2486f8d74c7e4008fcb60: 1.59
-    - Vector1_6947780ce4c843288916c1eb1a941919: 0.2
+    - Vector1_68e4083b4fa2486f8d74c7e4008fcb60: 1.41
+    - Vector1_6947780ce4c843288916c1eb1a941919: 0.25
     - Vector1_77abf1abed864e349e7f973688fc3082: 0
-    - Vector1_7b950dd5c9434f828bb146cdf0b66fba: 1
-    - Vector1_f59a161359204025ac750552ec5a19ce: 0.39
-    - Vector1_f59a161359204025ac750552ec5a19ce_1: 0.566
-    - Vector1_f83f9086362041598f104f59896ad3d3: 1
-    - _NoiseIntensity: 0.573
+    - Vector1_7b950dd5c9434f828bb146cdf0b66fba: 1.98
+    - Vector1_f59a161359204025ac750552ec5a19ce: 0.647
+    - Vector1_f59a161359204025ac750552ec5a19ce_1: 0.721
+    - Vector1_f83f9086362041598f104f59896ad3d3: 0.28
+    - _NoiseIntensity: 0.18
     m_Colors:
-    - Vector2_4dcccdae63fa47e6b454cf082d0750ca: {r: 0.005, g: 0.01, b: 0, a: 0}
-    - _InnerColor: {r: 1, g: 1, b: 1, a: 0}
-    - _OuterColor: {r: 0.735849, g: 0.735849, b: 0.735849, a: 0}
+    - Vector2_4dcccdae63fa47e6b454cf082d0750ca: {r: 0.003, g: 0.01, b: 0, a: 0}
+    - _InnerColor: {r: 0.045612313, g: 0.09699485, b: 0.38679248, a: 1}
+    - _OuterColor: {r: 0.26330543, g: 0.6027789, b: 0.9150943, a: 1}
   m_BuildTextureStacks: []

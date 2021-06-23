@@ -38,11 +38,11 @@ public class DayTimeController : MonoBehaviour
     private Color skyboxNightColor;
 
     Color currBackgroundColor;
-    float currInGameTime = 12;
+    float currInGameTime = 19;
 
     void Start()
     {
-        PlayersManager.LeftHand.TouchpadPos.onMove += ManageTime;
+        //PlayersManager.LeftHand.TouchpadPos.onMove += ManageTime;
         SetLightColor();
     }
 

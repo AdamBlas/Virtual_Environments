@@ -4,15 +4,20 @@ using UnityEngine;
 
 public class RefProbePosition : MonoBehaviour
 {
-    public Transform refProbeTransform;
+    public Transform cameraTransform;
     public Transform waterTransform;
+
+    public void Start()
+    {
+        cameraTransform = Camera.main.transform;
+    }
 
     void Update()
     {
-        refProbeTransform.position = new Vector3(
-            this.transform.position.x,
-            this.transform.position.y - (2 * (this.transform.position.y - waterTransform.position.y)),
-            this.transform.position.z
+        this.transform.position = new Vector3(
+            cameraTransform.transform.position.x,
+            cameraTransform.transform.position.y - (2 * (cameraTransform.transform.position.y - waterTransform.position.y)),
+            cameraTransform.transform.position.z
             );
     }
 }

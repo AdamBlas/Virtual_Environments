@@ -112,7 +112,6 @@ public class Bow_Arrow : MonoBehaviour
                 if (hit.collider.CompareTag("Target"))
                 {
                     SetParent(hit.collider.transform);
-                    hit.collider.GetComponent<ShootingTarget>().AnalyzeHit(hit.point);
                 }
                 else if (hit.collider.CompareTag("Movable Terrain"))
                 {

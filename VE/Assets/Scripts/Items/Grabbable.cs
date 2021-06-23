@@ -43,9 +43,7 @@ public class Grabbable : MonoBehaviour
     /// <summary> Currently hovered grabber object </summary>
     Grabber grabber;
 
-
-
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody>();
         onGrab += (_) => Utils.PlaySound(onGrabAudio);
@@ -86,6 +84,6 @@ public class Grabbable : MonoBehaviour
 
     private bool IsConditionMet(Collider other)
     {
-        return (canBeGrabbedWithRightHand && other.tag.Equals("RightHand")) || (canBeGrabbedWithLeftHand && other.tag.Equals("LeftHand"));
+        return (canBeGrabbedWithRightHand && other.CompareTag("RightHand")) || (canBeGrabbedWithLeftHand && other.CompareTag("LeftHand"));
     }
 }

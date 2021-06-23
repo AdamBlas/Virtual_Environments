@@ -20,6 +20,11 @@ public class Flammable : MonoBehaviour
     [SerializeField]
     [Range(0, 1)]
     private float minLightIntensity;
+    [SerializeField]
+    [Range(0, 5)]
+    private float maxLightIntensity;
+
+
 
     private long lightStartTime;
     
@@ -57,7 +62,7 @@ public class Flammable : MonoBehaviour
         while (isLit)
         {
             float x = (Time.frameCount - lightStartTime) * 0.08f;
-            float intensity = minLightIntensity + (1 - minLightIntensity) * (Mathf.PerlinNoise(x, 0));
+            float intensity = minLightIntensity + (maxLightIntensity - minLightIntensity) * (Mathf.PerlinNoise(x, 0));
             lightSource.intensity = intensity;
             yield return null;
         }
@@ -75,14 +80,13 @@ public class Flammable : MonoBehaviour
     }
 
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
-        if (other.tag.Equals("FireSource") && other.GetComponent<Flammable>().isLit)
+        if (other.CompareTag("FireSource") && other.GetComponent<Flammable>().isLit)
         {
             if (!isLit)
             {
                 LightFire();
-                Invoke("ExtinguishFire", 5);
             }
         }
     }
